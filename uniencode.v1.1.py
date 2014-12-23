@@ -98,15 +98,16 @@ def dtstat(dtroot,pattern):
     changed=0
     for path, dirs, files in os.walk(os.path.abspath(dtroot)):
         for filename in fnmatch.filter(files, pattern):
-             if os.path.islink(file_path):
+            file_path = os.path.join(path, filename)
+            if os.path.islink(file_path):
                 continue
-             if os.path.isfile(file_path):
+            if os.path.isfile(file_path):
                 if is_binary(file_path):
-                    print "Ignoring binary file %s" %(file_path)
+                    print "Ignoring binary file %s" % file_path
                     continue
-                if unify_encoding(os.path.join(path, filename)):
-                    changed+=1
-    print "Changed %s files in total" %(changed)
+                if unify_encoding(file_path):
+                    changed += 1
+    print "Changed %s files in total" % changed
 
 
 def main():
