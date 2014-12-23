@@ -1,4 +1,6 @@
 #!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 # Copyright (c) 2008-2014, Mei Li Triantafylllidi.
 # All rights reserved.
 
@@ -158,9 +160,63 @@ def main():
     except LookupError,e :
         print e
 
+
+def test_full_file_one_encoding():
+    import tempfile
+    _, path = tempfile.mkstemp()
+
+    phrase = u"αυτά είναι ελληνικά"
+    initial_encoding = "iso-8859-7"
+    final_encoding = "utf-8"
+
+    with open(path, "w") as f:
+        f.write(phrase.encode(initial_encoding))
+
+    uniencodefile(path)
+
+    with open(path) as f:
+        final_phrase = unicode(f.read(), encoding=final_encoding)
+        assert phrase == final_phrase, "final phrase is %s " % final_phrase
+    os.remove(path)
+
+
+def test_many_encodings_per_file():
+    import tempfile
+    _, path = tempfile.mkstemp()
+
+    phrase = u"αυτά είναι ελληνικά"
+    initial_encoding = "iso-8859-7"
+    final_encoding = "utf-8"
+
+    with open(path, "w") as f:
+        f.write(phrase.encode(initial_encoding))
+        f.write("\n")
+        f.write(phrase.encode(final_encoding))
+        f.write("\n")
+        f.write(phrase.encode(final_encoding))
+        f.write("\n")
+        f.write(phrase.encode(final_encoding))
+
+    uniencodefile(path)
+    input_phrase = phrase + "\n" + phrase + "\n" + phrase + "\n" + phrase
+    with open(path) as f:
+        file_content = f.read()
+        final_phrase = unicode(file_content, encoding=final_encoding)
+        assert input_phrase == final_phrase, file_content
+    os.remove(path)
+
+
+def test():
+    test_full_file_one_encoding()
+    test_many_encodings_per_file()
+
+
         
   
 if __name__== '__main__':
-  main()
+    if sys.argv[-1] == "--test":
+        test()
+        sys.exit(1)
+    main()
 
 
