@@ -7,24 +7,30 @@ GET Help:
 python uniencode.py -h
 # In WINDOWS binary files are not excluded, but usually detecting encoding confidence is low so they are ignored
 """
-
-
 import os, sys
 import codecs, fnmatch
 from optparse import OptionParser, OptionGroup
+
+
+CHARDET_IMPORT_ERROR = """Error: %s
+Please install chardet from http://pypi.python.org/pypi/chardet.
+To avoid full installation keep the chardet directory at the same directory with this script."""
+
+
 try:
     import chardet
-except ImportError, e:
-    print "Error: %s\nPlease install chardet from http://pypi.python.org/pypi/chardet.\nTo avoid full installation keep the chardet directory at the same directory with this script." %(e)
+except ImportError as e:
+    print CHARDET_IMPORT_ERROR % e
     sys.exit(1)
 
+
 default_target_encoding='utf-8'
+
 
 def isBinary(name):
     if 'win' in sys.platform:
         return False
     return os.system('file "' + name + '" | grep text > /dev/null')
-
 
 
 def uniencodefile(fullf):
