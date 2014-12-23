@@ -55,47 +55,47 @@ def unify_encoding(file_path):
             f.close()
             f2.close()
             os.remove(file_path)
-            os.rename(file_path+'tmp',file_path)
+            os.rename(file_path + 'tmp', file_path)
         except UnicodeEncodeError:
-            print "Changing %s file from %s encoding to %s is NOT possible"  %(file_path,enc['encoding'],default_target_encoding)
+            print "Changing %s file from %s encoding to %s is NOT possible" % (file_path, enc['encoding'], default_target_encoding)
             f.close()
             f2.close()
             os.remove(file_path+'tmp')
             return False
         except UnicodeDecodeError:
-            print "Wrong encoding guess. %s file remains unchanged"  %(file_path)
+            print "Wrong encoding guess. %s file remains unchanged" % file_path
             f.close()
             f2.close()
             os.remove(file_path+'tmp')
             return False
         return True
-    if enc['confidence']>0.5 and enc['confidence']<=0.7:
-        print "Changing %s file row by row to %s, with conf %s" %(file_path,default_target_encoding,enc['confidence'])
-        problems=False
-        f=open(file_path)
-        f2=open(file_path+'tmp','w')
+    if enc['confidence'] > 0.5 and enc['confidence'] <= 0.7:
+        print "Changing %s file row by row to %s, with conf %s" % (file_path, default_target_encoding, enc['confidence'])
+        problems = False
+        f = open(file_path)
+        f2 = open(file_path+'tmp','w')
         for line in f:
-            lineenc=chardet.detect(line)
-            if (not lineenc['encoding']) or lineenc['confidence']<0.7:
-                problems=True
+            lineenc = chardet.detect(line)
+            if (not lineenc['encoding']) or lineenc['confidence'] < 0.7:
+                problems = True
                 f2.write(line)
             else:
                 try:
-                    f2.write(unicode(line,lineenc['encoding']).encode(default_target_encoding))
+                    f2.write(unicode(line, lineenc['encoding']).encode(default_target_encoding))
                 except (UnicodeDecodeError, UnicodeEncodeError):
-                    problems=True
+                    problems = True
                     f2.write(line)
         f.close()
         f2.close()
         os.remove(file_path)
-        os.rename(file_path+'tmp',file_path)
+        os.rename(file_path+'tmp', file_path)
         if problems:
-            print "Some lines of %s file had corrupted encodings and remained unchanged" %(file_path)
+            print "Some lines of %s file had corrupted encodings and remained unchanged" % file_path
         return True
 
 
-def dtstat(dtroot,pattern):
-    changed=0
+def dtstat(dtroot, pattern):
+    changed = 0
     for path, dirs, files in os.walk(os.path.abspath(dtroot)):
         for filename in fnmatch.filter(files, pattern):
             file_path = os.path.join(path, filename)
@@ -119,7 +119,7 @@ def main():
                     Prints nothing if no actions are taken due to compatible or ascii encoding found
                     NOTE: Some editor open files with an encoding that cannot recognize some characters, so they replace them with ? (or sth similar), if the file is saved that way... there is no turning back!
                 """
-    parser = OptionParser(usage=usage,description=description)
+    parser = OptionParser(usage=usage, description=description)
     parser.add_option("-r", "--recursive",
                         action="store_true", dest="directory", default=False,
                       help="Operates recursively on folder FILE")
@@ -132,7 +132,7 @@ def main():
                         default='*',
                       help="Files matching pattern (works in directory mode)")
     group = OptionGroup(parser, "Examples",
-                    'python %s -r FOLDER -p "*.srt"  ' %(sys.argv[0]))
+                    'python %s -r FOLDER -p "*.srt"  ' % sys.argv[0])
 
     parser.add_option_group(group)
 
@@ -142,24 +142,24 @@ def main():
     global default_target_encoding
 
     if options.enc:
-        default_target_encoding=options.enc
-    if len(args)<1:
+        default_target_encoding = options.enc
+    if len(args) < 1:
         print "No input file or directory"
         return
     else:
-        fname=args[0]
+        fname = args[0]
 
         print fname
     try:
         if not options.directory:
-            file_pathname=os.path.abspath(fname)
+            file_pathname = os.path.abspath(fname)
             if os.path.isfile(file_pathname):
                 unify_encoding(file_pathname)
             else:
-                print "Not valid file: %s" %(fname)
+                print "Not valid file: %s" % fname
         else:
-            dtstat(fname,options.pattern)
-    except LookupError,e :
+            dtstat(fname, options.pattern)
+    except LookupError, e:
         print e
 
 
@@ -213,10 +213,9 @@ def test():
     test_many_encodings_per_file()
 
 
-if __name__== '__main__':
+if __name__ == '__main__':
     if sys.argv[-1] == "--test":
         test()
         sys.exit(1)
     main()
-
 
