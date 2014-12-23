@@ -36,15 +36,17 @@ def is_binary(name):
 
 
 def unify_encoding(file_path):
-    f = open(file_path)
-    enc = chardet.detect(f.read())
-    f.close()
+    with open(file_path) as fp:
+        enc = chardet.detect(f.read())
+
     if not enc['encoding']:
         print "Cannot detect file %s encoding" % file_path
         return False
+
     if enc['confidence'] <= 0.5:
         print "Not changing %s file from %s to %s, LOW conf (%s)" % (file_path, enc['encoding'], default_target_encoding, enc['confidence'])
         return False
+
     if enc['confidence'] > 0.7 and enc['encoding'].lower() != default_target_encoding and enc['encoding'] != 'ascii':
         print "Changing %s file from %s to %s, with conf %s" % (file_path, enc['encoding'], default_target_encoding, enc['confidence'])
         f = codecs.open(file_path, 'r', enc['encoding'])
