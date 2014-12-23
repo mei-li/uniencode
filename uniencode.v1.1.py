@@ -36,19 +36,19 @@ def is_binary(name):
 
 
 def unify_encoding(fullf):
-     f=open(fullf)
-     enc=chardet.detect(f.read())
+     f = open(fullf)
+     enc = chardet.detect(f.read())
      f.close()
      if not enc['encoding']:
-        print "Cannot detect file %s encoding" %(fullf)
+        print "Cannot detect file %s encoding" % fullf
         return False
-     if enc['confidence']<=0.5:
-        print "Not changing %s file from %s to %s, LOW conf (%s)" %(fullf,enc['encoding'],default_target_encoding,enc['confidence'])
+     if enc['confidence'] <= 0.5:
+        print "Not changing %s file from %s to %s, LOW conf (%s)" % (fullf, enc['encoding'], default_target_encoding, enc['confidence'])
         return False
-     if enc['confidence']>0.7 and enc['encoding'].lower()!=default_target_encoding and enc['encoding']!='ascii':
-        print "Changing %s file from %s to %s, with conf %s" %(fullf,enc['encoding'],default_target_encoding,enc['confidence'])
-        f=codecs.open(fullf,'r',enc['encoding'])
-        f2=open(fullf+'tmp','w')
+    if enc['confidence'] > 0.7 and enc['encoding'].lower() != default_target_encoding and enc['encoding'] != 'ascii':
+        print "Changing %s file from %s to %s, with conf %s" % (fullf, enc['encoding'], default_target_encoding, enc['confidence'])
+        f = codecs.open(fullf, 'r', enc['encoding'])
+        f2 = open(fullf + 'tmp', 'w')
         try:
             for line in f:
                 f2.write(line.encode(default_target_encoding))
