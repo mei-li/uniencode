@@ -36,11 +36,6 @@ def is_binary(name):
 
 
 def unify_encoding(fullf):
-     if os.path.islink(fullf):return False
-     if os.path.isfile(fullf):
-         if is_binary(fullf):
-            print "Ignoring binary file %s" %(fullf)
-            return False
      f=open(fullf)
      enc=chardet.detect(f.read())
      f.close()
@@ -103,8 +98,14 @@ def dtstat(dtroot,pattern):
     changed=0
     for path, dirs, files in os.walk(os.path.abspath(dtroot)):
         for filename in fnmatch.filter(files, pattern):
-            if unify_encoding(os.path.join(path, filename)):
-                changed+=1
+             if os.path.islink(fullf):
+                continue
+             if os.path.isfile(fullf):
+                if is_binary(fullf):
+                    print "Ignoring binary file %s" %(fullf)
+                    continue
+                if unify_encoding(os.path.join(path, filename)):
+                    changed+=1
     print "Changed %s files in total" %(changed)
 
 
