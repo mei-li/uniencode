@@ -44,14 +44,14 @@ def uniencodefile(fullf):
      f=open(fullf)
      enc=chardet.detect(f.read())
      f.close()
-     if not enc['encoding']: 
-        print "Cannot detect file %s encoding" %(fullf)           
+     if not enc['encoding']:
+        print "Cannot detect file %s encoding" %(fullf)
         return False
      if enc['confidence']<=0.5:
-        print "Not changing %s file from %s to %s, LOW conf (%s)" %(fullf,enc['encoding'],default_target_encoding,enc['confidence'])           
+        print "Not changing %s file from %s to %s, LOW conf (%s)" %(fullf,enc['encoding'],default_target_encoding,enc['confidence'])
         return False
-     if enc['confidence']>0.7 and enc['encoding'].lower()!=default_target_encoding and enc['encoding']!='ascii': 
-        print "Changing %s file from %s to %s, with conf %s" %(fullf,enc['encoding'],default_target_encoding,enc['confidence'])           
+     if enc['confidence']>0.7 and enc['encoding'].lower()!=default_target_encoding and enc['encoding']!='ascii':
+        print "Changing %s file from %s to %s, with conf %s" %(fullf,enc['encoding'],default_target_encoding,enc['confidence'])
         f=codecs.open(fullf,'r',enc['encoding'])
         f2=open(fullf+'tmp','w')
         try:
@@ -75,7 +75,7 @@ def uniencodefile(fullf):
             return False
         return True
      if enc['confidence']>0.5 and enc['confidence']<=0.7:
-        print "Changing %s file row by row to %s, with conf %s" %(fullf,default_target_encoding,enc['confidence'])     
+        print "Changing %s file row by row to %s, with conf %s" %(fullf,default_target_encoding,enc['confidence'])
         problems=False
         f=open(fullf)
         f2=open(fullf+'tmp','w')
@@ -89,16 +89,16 @@ def uniencodefile(fullf):
                     f2.write(unicode(line,lineenc['encoding']).encode(default_target_encoding))
                 except (UnicodeDecodeError, UnicodeEncodeError):
                     problems=True
-                    f2.write(line)                    
+                    f2.write(line)
         f.close()
         f2.close()
         os.remove(fullf)
         os.rename(fullf+'tmp',fullf)
         if problems:
-            print "Some lines of %s file had corrupted encodings and remained unchanged" %(fullf)     
+            print "Some lines of %s file had corrupted encodings and remained unchanged" %(fullf)
         return True
 
-     
+
 def dtstat(dtroot,pattern):
     changed=0
     for path, dirs, files in os.walk(os.path.abspath(dtroot)):
@@ -113,7 +113,7 @@ def main():
     description="""This program reencodes files to utf8 or a custom encoding, it works for single files, and also recursively for a directory. It avoids binary files.\n
                     FIles change ONLY if encoding is detected with HIGH confidence.
                     IF you use custom encoding, if it is not a unicode encoding eg. UTF8 or UTF16, changing could be impossible.
-                    
+
                     Prints nothing if no actions are taken due to compatible or ascii encoding found
                     NOTE: Some editor open files with an encoding that cannot recognize some characters, so they replace them with ? (or sth similar), if the file is saved that way... there is no turning back!
                 """
@@ -211,8 +211,6 @@ def test():
     test_many_encodings_per_file()
 
 
-        
-  
 if __name__== '__main__':
     if sys.argv[-1] == "--test":
         test()
