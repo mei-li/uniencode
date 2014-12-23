@@ -35,45 +35,45 @@ def is_binary(name):
     return os.system('file "' + name + '" | grep text > /dev/null')
 
 
-def unify_encoding(fullf):
-     f = open(fullf)
+def unify_encoding(file_path):
+     f = open(file_path)
      enc = chardet.detect(f.read())
      f.close()
      if not enc['encoding']:
-        print "Cannot detect file %s encoding" % fullf
+        print "Cannot detect file %s encoding" % file_path
         return False
      if enc['confidence'] <= 0.5:
-        print "Not changing %s file from %s to %s, LOW conf (%s)" % (fullf, enc['encoding'], default_target_encoding, enc['confidence'])
+        print "Not changing %s file from %s to %s, LOW conf (%s)" % (file_path, enc['encoding'], default_target_encoding, enc['confidence'])
         return False
     if enc['confidence'] > 0.7 and enc['encoding'].lower() != default_target_encoding and enc['encoding'] != 'ascii':
-        print "Changing %s file from %s to %s, with conf %s" % (fullf, enc['encoding'], default_target_encoding, enc['confidence'])
-        f = codecs.open(fullf, 'r', enc['encoding'])
-        f2 = open(fullf + 'tmp', 'w')
+        print "Changing %s file from %s to %s, with conf %s" % (file_path, enc['encoding'], default_target_encoding, enc['confidence'])
+        f = codecs.open(file_path, 'r', enc['encoding'])
+        f2 = open(file_path + 'tmp', 'w')
         try:
             for line in f:
                 f2.write(line.encode(default_target_encoding))
             f.close()
             f2.close()
-            os.remove(fullf)
-            os.rename(fullf+'tmp',fullf)
+            os.remove(file_path)
+            os.rename(file_path+'tmp',file_path)
         except UnicodeEncodeError:
-            print "Changing %s file from %s encoding to %s is NOT possible"  %(fullf,enc['encoding'],default_target_encoding)
+            print "Changing %s file from %s encoding to %s is NOT possible"  %(file_path,enc['encoding'],default_target_encoding)
             f.close()
             f2.close()
-            os.remove(fullf+'tmp')
+            os.remove(file_path+'tmp')
             return False
         except UnicodeDecodeError:
-            print "Wrong encoding guess. %s file remains unchanged"  %(fullf)
+            print "Wrong encoding guess. %s file remains unchanged"  %(file_path)
             f.close()
             f2.close()
-            os.remove(fullf+'tmp')
+            os.remove(file_path+'tmp')
             return False
         return True
      if enc['confidence']>0.5 and enc['confidence']<=0.7:
-        print "Changing %s file row by row to %s, with conf %s" %(fullf,default_target_encoding,enc['confidence'])
+        print "Changing %s file row by row to %s, with conf %s" %(file_path,default_target_encoding,enc['confidence'])
         problems=False
-        f=open(fullf)
-        f2=open(fullf+'tmp','w')
+        f=open(file_path)
+        f2=open(file_path+'tmp','w')
         for line in f:
             lineenc=chardet.detect(line)
             if (not lineenc['encoding']) or lineenc['confidence']<0.7:
@@ -87,10 +87,10 @@ def unify_encoding(fullf):
                     f2.write(line)
         f.close()
         f2.close()
-        os.remove(fullf)
-        os.rename(fullf+'tmp',fullf)
+        os.remove(file_path)
+        os.rename(file_path+'tmp',file_path)
         if problems:
-            print "Some lines of %s file had corrupted encodings and remained unchanged" %(fullf)
+            print "Some lines of %s file had corrupted encodings and remained unchanged" %(file_path)
         return True
 
 
@@ -98,11 +98,11 @@ def dtstat(dtroot,pattern):
     changed=0
     for path, dirs, files in os.walk(os.path.abspath(dtroot)):
         for filename in fnmatch.filter(files, pattern):
-             if os.path.islink(fullf):
+             if os.path.islink(file_path):
                 continue
-             if os.path.isfile(fullf):
-                if is_binary(fullf):
-                    print "Ignoring binary file %s" %(fullf)
+             if os.path.isfile(file_path):
+                if is_binary(file_path):
+                    print "Ignoring binary file %s" %(file_path)
                     continue
                 if unify_encoding(os.path.join(path, filename)):
                     changed+=1
@@ -151,9 +151,9 @@ def main():
         print fname
     try:
         if not options.directory:
-            fullfname=os.path.abspath(fname)
-            if os.path.isfile(fullfname):
-                unify_encoding(fullfname)
+            file_pathname=os.path.abspath(fname)
+            if os.path.isfile(file_pathname):
+                unify_encoding(file_pathname)
             else:
                 print "Not valid file: %s" %(fname)
         else:
