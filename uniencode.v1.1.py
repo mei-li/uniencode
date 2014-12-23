@@ -1,3 +1,6 @@
+#!/usr/bin/python
+# Copyright (c) 2008-2014, Mei Li Triantafylllidi.
+# All rights reserved.
 
 """
 GET Help:
