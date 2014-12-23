@@ -29,16 +29,16 @@ except ImportError as e:
 default_target_encoding='utf-8'
 
 
-def isBinary(name):
+def is_binary(name):
     if 'win' in sys.platform:
         return False
     return os.system('file "' + name + '" | grep text > /dev/null')
 
 
-def uniencodefile(fullf):
+def unify_encoding(fullf):
      if os.path.islink(fullf):return False
      if os.path.isfile(fullf):
-         if isBinary(fullf):
+         if is_binary(fullf):
             print "Ignoring binary file %s" %(fullf)
             return False
      f=open(fullf)
@@ -103,7 +103,7 @@ def dtstat(dtroot,pattern):
     changed=0
     for path, dirs, files in os.walk(os.path.abspath(dtroot)):
         for filename in fnmatch.filter(files, pattern):
-            if uniencodefile(os.path.join(path, filename)):
+            if unify_encoding(os.path.join(path, filename)):
                 changed+=1
     print "Changed %s files in total" %(changed)
 
@@ -152,7 +152,7 @@ def main():
         if not options.directory:
             fullfname=os.path.abspath(fname)
             if os.path.isfile(fullfname):
-                uniencodefile(fullfname)
+                unify_encoding(fullfname)
             else:
                 print "Not valid file: %s" %(fname)
         else:
@@ -172,7 +172,7 @@ def test_full_file_one_encoding():
     with open(path, "w") as f:
         f.write(phrase.encode(initial_encoding))
 
-    uniencodefile(path)
+    unify_encoding(path)
 
     with open(path) as f:
         final_phrase = unicode(f.read(), encoding=final_encoding)
@@ -197,7 +197,7 @@ def test_many_encodings_per_file():
         f.write("\n")
         f.write(phrase.encode(final_encoding))
 
-    uniencodefile(path)
+    unify_encoding(path)
     input_phrase = phrase + "\n" + phrase + "\n" + phrase + "\n" + phrase
     with open(path) as f:
         file_content = f.read()
