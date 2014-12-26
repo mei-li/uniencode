@@ -10,6 +10,7 @@ python uniencode.py -h
 # In WINDOWS binary files are not excluded, but usually detecting encoding confidence is low so they are ignored
 """
 import os, sys
+import tempfile
 import codecs, fnmatch
 from optparse import OptionParser, OptionGroup
 
@@ -53,14 +54,14 @@ def unify_encoding(file_path, target_encoding):
     if confidence > 0.7 and encoding.lower() != target_encoding and encoding != 'ascii':
         print "Changing %s file from %s to %s, with conf %s" % (file_path, encoding, target_encoding, confidence)
         f = codecs.open(file_path, 'r', encoding)
-        f2 = open(file_path + 'tmp', 'w')
+        f2 = tempfile.NamedTemporaryFile(mode='w', delete=False)
         try:
             for line in f:
                 f2.write(line.encode(target_encoding))
             f.close()
             f2.close()
             os.remove(file_path)
-            os.rename(file_path + 'tmp', file_path)
+            os.rename(f2.name, file_path)
         except UnicodeEncodeError:
             print "Changing %s file from %s encoding to %s is NOT possible" % (file_path, encoding, target_encoding)
             f.close()
