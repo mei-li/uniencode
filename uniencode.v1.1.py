@@ -37,10 +37,10 @@ def is_binary(name):
 
 def unify_encoding(file_path):
     with open(file_path) as fp:
-        enc = chardet.detect(f.read())
+        enc = chardet.detect(fp.read())
 
-    confidence = confidence
-    encoding = encoding
+    confidence = enc['confidence']
+    encoding = enc['encoding']
 
     if not encoding:
         print "Cannot detect file %s encoding" % file_path
@@ -80,13 +80,13 @@ def unify_encoding(file_path):
         f = open(file_path)
         f2 = open(file_path+'tmp','w')
         for line in f:
-            lineenc = chardet.detect(line)
-            if (not lineencoding) or lineconfidence < 0.7:
+            line_info = chardet.detect(line)
+            if (not line_info['encoding']) or line_info['confidence'] < 0.7:
                 problems = True
                 f2.write(line)
             else:
                 try:
-                    f2.write(unicode(line, lineencoding).encode(default_target_encoding))
+                    f2.write(unicode(line, line_info['encoding']).encode(default_target_encoding))
                 except (UnicodeDecodeError, UnicodeEncodeError):
                     problems = True
                     f2.write(line)
