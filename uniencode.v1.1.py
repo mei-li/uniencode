@@ -9,9 +9,12 @@ GET Help:
 python uniencode.py -h
 # In WINDOWS binary files are not excluded, but usually detecting encoding confidence is low so they are ignored
 """
-import os, sys
+import codecs
+import fnmatch
+import os
+import sys
 import tempfile
-import codecs, fnmatch
+
 from optparse import OptionParser, OptionGroup
 
 
@@ -142,7 +145,6 @@ def main():
 
     parser.add_option_group(group)
 
-
     (options, args) = parser.parse_args()
 
     if options.enc:
@@ -224,4 +226,3 @@ if __name__ == '__main__':
         test()
         sys.exit(1)
     main()
-
