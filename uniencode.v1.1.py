@@ -39,17 +39,20 @@ def unify_encoding(file_path):
     with open(file_path) as fp:
         enc = chardet.detect(f.read())
 
-    if not enc['encoding']:
+    confidence = confidence
+    encoding = encoding
+
+    if not encoding:
         print "Cannot detect file %s encoding" % file_path
         return False
 
-    if enc['confidence'] <= 0.5:
-        print "Not changing %s file from %s to %s, LOW conf (%s)" % (file_path, enc['encoding'], default_target_encoding, enc['confidence'])
+    if confidence <= 0.5:
+        print "Not changing %s file from %s to %s, LOW conf (%s)" % (file_path, encoding, default_target_encoding, confidence)
         return False
 
-    if enc['confidence'] > 0.7 and enc['encoding'].lower() != default_target_encoding and enc['encoding'] != 'ascii':
-        print "Changing %s file from %s to %s, with conf %s" % (file_path, enc['encoding'], default_target_encoding, enc['confidence'])
-        f = codecs.open(file_path, 'r', enc['encoding'])
+    if confidence > 0.7 and encoding.lower() != default_target_encoding and encoding != 'ascii':
+        print "Changing %s file from %s to %s, with conf %s" % (file_path, encoding, default_target_encoding, confidence)
+        f = codecs.open(file_path, 'r', encoding)
         f2 = open(file_path + 'tmp', 'w')
         try:
             for line in f:
@@ -59,7 +62,7 @@ def unify_encoding(file_path):
             os.remove(file_path)
             os.rename(file_path + 'tmp', file_path)
         except UnicodeEncodeError:
-            print "Changing %s file from %s encoding to %s is NOT possible" % (file_path, enc['encoding'], default_target_encoding)
+            print "Changing %s file from %s encoding to %s is NOT possible" % (file_path, encoding, default_target_encoding)
             f.close()
             f2.close()
             os.remove(file_path+'tmp')
@@ -71,19 +74,19 @@ def unify_encoding(file_path):
             os.remove(file_path+'tmp')
             return False
         return True
-    if enc['confidence'] > 0.5 and enc['confidence'] <= 0.7:
-        print "Changing %s file row by row to %s, with conf %s" % (file_path, default_target_encoding, enc['confidence'])
+    if confidence > 0.5 and confidence <= 0.7:
+        print "Changing %s file row by row to %s, with conf %s" % (file_path, default_target_encoding, confidence)
         problems = False
         f = open(file_path)
         f2 = open(file_path+'tmp','w')
         for line in f:
             lineenc = chardet.detect(line)
-            if (not lineenc['encoding']) or lineenc['confidence'] < 0.7:
+            if (not lineencoding) or lineconfidence < 0.7:
                 problems = True
                 f2.write(line)
             else:
                 try:
-                    f2.write(unicode(line, lineenc['encoding']).encode(default_target_encoding))
+                    f2.write(unicode(line, lineencoding).encode(default_target_encoding))
                 except (UnicodeDecodeError, UnicodeEncodeError):
                     problems = True
                     f2.write(line)
