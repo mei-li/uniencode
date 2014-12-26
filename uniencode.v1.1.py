@@ -50,11 +50,13 @@ def unify_encoding(file_path, target_encoding):
         print "Cannot detect file %s encoding" % file_path
         return False
 
+    encoding = encoding.lower()
+
     if confidence <= 0.5:
         print "Not changing %s file from %s to %s, LOW conf (%s)" % (file_path, encoding, target_encoding, confidence)
         return False
 
-    if confidence > 0.7 and encoding.lower() != target_encoding and encoding != 'ascii':
+    if confidence > 0.7 and encoding != target_encoding and encoding != 'ascii':
         print "Changing %s file from %s to %s, with conf %s" % (file_path, encoding, target_encoding, confidence)
         f = codecs.open(file_path, 'r', encoding)
         f2 = tempfile.NamedTemporaryFile(mode='w', delete=False)
