@@ -60,32 +60,36 @@ def unify_encoding(file_path, target_encoding):
                                                                      confidence)
         return False
 
-    if confidence > 0.7 and encoding != target_encoding and encoding != 'ascii':
-        print "Changing %s file from %s to %s, with conf %s" % (file_path, encoding, target_encoding, confidence)
-        f = codecs.open(file_path, 'r', encoding)
-        f2 = tempfile.NamedTemporaryFile(mode='w', delete=False)
-        try:
-            for line in f:
-                f2.write(line.encode(target_encoding))
-            f.close()
-            f2.close()
+    elif confidence > 0.7 and encoding != target_encoding and encoding != 'ascii':
+        print "Changing %s file from %s to %s, with conf %s" % (file_path,
+                                                                encoding,
+                                                                target_encoding,
+                                                                confidence)
+        swap_files = False
+        with codecs.open(file_path, 'r', encoding) as file_orig, \
+                tempfile.NamedTemporaryFile(mode='w', delete=False) as file_changed:
+            try:
+                for line in file_orig:
+                    file_changed.write(line.encode(target_encoding))
+                swap_files = True
+            except UnicodeEncodeError:
+                print "Changing %s file from %s encoding to %s is NOT possible" % (file_path,
+                                                                                   encoding,
+                                                                                   target_encoding)
+            except UnicodeDecodeError:
+                print "Wrong encoding guess. %s file remains unchanged" % file_path
+        if swap_files:
             os.remove(file_path)
-            os.rename(f2.name, file_path)
-        except UnicodeEncodeError:
-            print "Changing %s file from %s encoding to %s is NOT possible" % (file_path, encoding, target_encoding)
-            f.close()
-            f2.close()
-            os.remove(file_path+'tmp')
+            os.rename(file_changed.name, file_path)
+            return True
+        else:
+            os.remove(file_changed.name)
             return False
-        except UnicodeDecodeError:
-            print "Wrong encoding guess. %s file remains unchanged" % file_path
-            f.close()
-            f2.close()
-            os.remove(file_path+'tmp')
-            return False
-        return True
-    if confidence > 0.5 and confidence <= 0.7:
-        print "Changing %s file row by row to %s, with conf %s" % (file_path, target_encoding, confidence)
+
+    elif confidence > 0.5 and confidence <= 0.7:
+        print "Changing %s file row by row to %s, with conf %s" % (file_path,
+                                                                   target_encoding,
+                                                                   confidence)
         problems = False
         f = open(file_path)
         f2 = open(file_path+'tmp', 'w')
