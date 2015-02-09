@@ -130,13 +130,11 @@ def dtstat(dtroot, pattern, target_encoding):
 
 def main():
     usage = "usage: %prog [options] FILE"
-    description="""This program re-encodes files to utf8 or a custom encoding, it works for single files, and also recursively for a directory. It avoids binary files.\n
-                    FIles change ONLY if encoding is detected with HIGH confidence.
-                    IF you use custom encoding, if it is not a unicode encoding eg. UTF8 or UTF16, changing could be impossible.
+    description = """This script re-encodes files to utf8 or custom encoding, it works for
+single files and also recursively for a directory. It avoids binary files. FIles change ONLY if
+encoding is detected with HIGH confidence. Prints nothing if no actions are taken due
+to compatible or ascii encoding found."""
 
-                    Prints nothing if no actions are taken due to compatible or ascii encoding found
-                    NOTE: Some editor open files with an encoding that cannot recognize some characters, so they replace them with ? (or sth similar), if the file is saved that way... there is no turning back!
-                """
     parser = OptionParser(usage=usage, description=description)
     parser.add_option("-r", "--recursive",
                       action="store_true", dest="directory", default=False,
