@@ -5,9 +5,10 @@
 # All rights reserved.
 
 """
-GET Help:
-python uniencode.py -h
-# In WINDOWS binary files are not excluded, but usually detecting encoding confidence is low so they are ignored
+This script changes text file encodings or recursively in directories from a
+detected encoding to a given one, or to utf-8 by default. For parameters
+reference do:
+> python uniencode.py -h
 """
 import codecs
 import fnmatch
@@ -18,7 +19,7 @@ import tempfile
 from optparse import OptionParser, OptionGroup
 
 
-CHARDET_IMPORT_ERROR = """Error: %s
+CHARDET_IMPORT_ERROR_MSG = """Error: %s
 Please install chardet from http://pypi.python.org/pypi/chardet.
 To avoid full installation keep the chardet directory at the same directory with this script."""
 
@@ -26,7 +27,7 @@ To avoid full installation keep the chardet directory at the same directory with
 try:
     import chardet
 except ImportError as e:
-    print CHARDET_IMPORT_ERROR % e
+    print CHARDET_IMPORT_ERROR_MSG % e
     sys.exit(1)
 
 
@@ -53,7 +54,10 @@ def unify_encoding(file_path, target_encoding):
     encoding = encoding.lower()
 
     if confidence <= 0.5:
-        print "Not changing %s file from %s to %s, LOW conf (%s)" % (file_path, encoding, target_encoding, confidence)
+        print "Not changing %s file from %s to %s, LOW conf (%s)" % (file_path,
+                                                                     encoding,
+                                                                     target_encoding,
+                                                                     confidence)
         return False
 
     if confidence > 0.7 and encoding != target_encoding and encoding != 'ascii':
