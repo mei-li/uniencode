@@ -91,23 +91,22 @@ def unify_encoding(file_path, target_encoding):
                                                                    target_encoding,
                                                                    confidence)
         problems = False
-        f = open(file_path)
-        f2 = open(file_path+'tmp', 'w')
-        for line in f:
-            line_info = chardet.detect(line)
-            if (not line_info['encoding']) or line_info['confidence'] < 0.7:
-                problems = True
-                f2.write(line)
-            else:
-                try:
-                    f2.write(unicode(line, line_info['encoding']).encode(target_encoding))
-                except (UnicodeDecodeError, UnicodeEncodeError):
+        with open(file_path) as file_orig, tempfile.NamedTemporaryFile(
+                mode='w', delete=False) as file_changed:
+            for line in file_orig:
+                line_info = chardet.detect(line)
+                if (not line_info['encoding']) or line_info['confidence'] < 0.7:
                     problems = True
-                    f2.write(line)
-        f.close()
-        f2.close()
+                    file_changed.write(line)
+                else:
+                    try:
+                        line_changed = unicode(line, line_info['encoding']).encode(target_encoding)
+                        file_changed.write(line_changed)
+                    except (UnicodeDecodeError, UnicodeEncodeError):
+                        problems = True
+                        file_changed.write(line)
         os.remove(file_path)
-        os.rename(file_path+'tmp', file_path)
+        os.rename(file_changed.name, file_path)
         if problems:
             print "Some lines of %s file had corrupted encodings and remained unchanged" % file_path
         return True
