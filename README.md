@@ -1,4 +1,4 @@
-##uniencode
+## uniencode
 
 A script to unify file encodings when multiple encodings are 
 included in a file or change from one encoding to another. 
