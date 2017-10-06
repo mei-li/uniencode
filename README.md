@@ -5,7 +5,7 @@ included in a file or change from one encoding to another.
 
 Tested with: Python 2.7
 
-## Examples:
+## Examples
 
   - Change file from detected encoding(s) to utf-8
   
